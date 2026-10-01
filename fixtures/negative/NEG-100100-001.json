@@ -1,0 +1,29 @@
+{
+  "case_id": "NEG-100100-001",
+  "kind": "negative",
+  "detection_id": "DET-100100",
+  "description": "Normal AES service ticket for an internal application",
+  "source": "windows_security",
+  "event_id": "4769",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4769"
+      },
+      "eventdata": {
+        "ticketEncryptionType": "0x12",
+        "serviceName": "HTTP/app01.lab.local",
+        "targetUserName": "svc_web",
+        "ipAddress": "192.0.2.20",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "AES ticket does not match the lab RC4 Kerberoasting rule."
+}

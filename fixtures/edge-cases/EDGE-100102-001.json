@@ -1,0 +1,28 @@
+{
+  "case_id": "EDGE-100102-001",
+  "kind": "edge",
+  "detection_id": "DET-100102",
+  "description": "DCSync replication GUID appears in uppercase",
+  "source": "windows_security",
+  "event_id": "4662",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4662"
+      },
+      "eventdata": {
+        "properties": "1131F6AA-9C07-11D1-F79F-00C04FC2DCD2; CONTROL_ACCESS",
+        "subjectUserName": "svc_backup",
+        "ipAddress": "192.0.2.40",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100102",
+    "mitre": "T1003.006",
+    "action": "critical_investigation"
+  },
+  "notes": "The detection uses case-insensitive matching and should still fire."
+}

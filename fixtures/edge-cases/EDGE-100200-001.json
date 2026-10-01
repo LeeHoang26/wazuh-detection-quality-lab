@@ -1,0 +1,29 @@
+{
+  "case_id": "EDGE-100200-001",
+  "kind": "edge",
+  "detection_id": "DET-100200",
+  "description": "Defender touches a canary file during security scanning",
+  "source": "sysmon",
+  "event_id": "11",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "11"
+      },
+      "eventdata": {
+        "targetFilename": "C:\\\\Users\\\\Public\\\\!_financial_payroll_2026.txt",
+        "image": "C:\\\\Program Files\\\\Windows Defender\\\\MsMpEng.exe",
+        "processId": "900",
+        "computer": "WK01",
+        "user": "NT AUTHORITY\\SYSTEM"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100200",
+    "mitre": "T1486",
+    "action": "manual_review"
+  },
+  "notes": "The filename matches the rule, but the known Defender writer should not trigger destructive containment."
+}

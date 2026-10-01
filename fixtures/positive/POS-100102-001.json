@@ -1,0 +1,28 @@
+{
+  "case_id": "POS-100102-001",
+  "kind": "positive",
+  "detection_id": "DET-100102",
+  "description": "Directory replication access containing the DCSync replication GUID",
+  "source": "windows_security",
+  "event_id": "4662",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4662"
+      },
+      "eventdata": {
+        "properties": "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2; CONTROL_ACCESS",
+        "subjectUserName": "svc_backup",
+        "ipAddress": "192.0.2.40",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100102",
+    "mitre": "T1003.006",
+    "action": "critical_investigation"
+  },
+  "notes": "The replication GUID is the primary indicator used by the lab rule."
+}

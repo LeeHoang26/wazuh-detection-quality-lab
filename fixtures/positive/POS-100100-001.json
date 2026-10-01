@@ -1,0 +1,29 @@
+{
+  "case_id": "POS-100100-001",
+  "kind": "positive",
+  "detection_id": "DET-100100",
+  "description": "Kerberoasting pattern using an RC4 service ticket",
+  "source": "windows_security",
+  "event_id": "4769",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4769"
+      },
+      "eventdata": {
+        "ticketEncryptionType": "0x17",
+        "serviceName": "MSSQLSvc/db01.lab.local:1433",
+        "targetUserName": "analyst01",
+        "ipAddress": "192.0.2.40",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100100",
+    "mitre": "T1558.003",
+    "action": "alert_and_investigate"
+  },
+  "notes": "A single RC4 request is a lab signal; production tuning should add frequency and context."
+}

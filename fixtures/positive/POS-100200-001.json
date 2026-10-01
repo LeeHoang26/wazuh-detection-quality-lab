@@ -1,0 +1,29 @@
+{
+  "case_id": "POS-100200-001",
+  "kind": "positive",
+  "detection_id": "DET-100200",
+  "description": "Canary payroll file is modified by a simulated ransomware process",
+  "source": "sysmon",
+  "event_id": "11",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "11"
+      },
+      "eventdata": {
+        "targetFilename": "C:\\\\Users\\\\Public\\\\!_financial_payroll_2026.txt",
+        "image": "C:\\\\Tools\\\\ransomware_simulator.exe",
+        "processId": "4216",
+        "computer": "WK01",
+        "user": "HOANG\\Administrator"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100200",
+    "mitre": "T1486",
+    "action": "suspend_dump_terminate"
+  },
+  "notes": "The alert should preserve PID and filename context for follow-on triage."
+}

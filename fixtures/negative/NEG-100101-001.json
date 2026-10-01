@@ -1,0 +1,29 @@
+{
+  "case_id": "NEG-100101-001",
+  "kind": "negative",
+  "detection_id": "DET-100101",
+  "description": "Normal TGT request with pre-authentication enabled",
+  "source": "windows_security",
+  "event_id": "4768",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4768"
+      },
+      "eventdata": {
+        "preAuthType": "2",
+        "ticketEncryptionType": "0x12",
+        "targetUserName": "jdoe",
+        "ipAddress": "192.0.2.20",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "The event lacks both AS-REP indicators required by the rule."
+}

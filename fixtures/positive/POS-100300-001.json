@@ -1,0 +1,30 @@
+{
+  "case_id": "POS-100300-001",
+  "kind": "positive",
+  "detection_id": "DET-100300",
+  "description": "WMI remote shell creates cmd.exe under WmiPrvSE.exe",
+  "source": "sysmon",
+  "event_id": "1",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "1"
+      },
+      "eventdata": {
+        "parentImage": "C:\\\\Windows\\\\System32\\\\wbem\\\\WmiPrvSE.exe",
+        "image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+        "commandLine": "cmd.exe /Q /c whoami",
+        "computer": "WK01",
+        "user": "HOANG\\Administrator",
+        "processId": "2216"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100300",
+    "mitre": "T1047",
+    "action": "correlate_and_isolate"
+  },
+  "notes": "Sysmon provides process lineage; Security Event 4624 supplies the remote source context."
+}

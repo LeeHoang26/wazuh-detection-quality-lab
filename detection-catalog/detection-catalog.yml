@@ -1,0 +1,49 @@
+- id: DET-100100
+  name: Kerberoasting Request
+  rule_id: "100100"
+  data_source: Windows Security Event 4769
+  mitre_attack: T1558.003
+  hypothesis: An RC4 service ticket request may indicate Kerberoasting activity.
+  required_fields: [eventID, ticketEncryptionType, serviceName, targetUserName]
+  response: alert_and_investigate
+  limitation: A single RC4 request can be legitimate legacy activity.
+
+- id: DET-100101
+  name: AS-REP Roasting
+  rule_id: "100101"
+  data_source: Windows Security Event 4768
+  mitre_attack: T1558.004
+  hypothesis: A TGT request with pre-authentication disabled and RC4 encryption may indicate AS-REP Roasting.
+  required_fields: [eventID, preAuthType, ticketEncryptionType, targetUserName]
+  response: alert_and_investigate
+  limitation: Automated identity disablement needs an approved production playbook.
+
+- id: DET-100102
+  name: DCSync Credential Extraction
+  rule_id: "100102"
+  data_source: Windows Security Event 4662
+  mitre_attack: T1003.006
+  hypothesis: Directory replication access by an unexpected identity may indicate DCSync.
+  required_fields: [eventID, properties, subjectUserName]
+  response: critical_investigation
+  limitation: The lab checks the replication GUID but does not establish whether the caller is an approved DC.
+
+- id: DET-100300
+  name: WMI or WinRM Remote Shell
+  rule_id: "100300"
+  data_source: Sysmon Event 1 plus Security Event 4624
+  mitre_attack: T1047 and T1021.006
+  hypothesis: An interactive shell spawned by WmiPrvSE.exe or wsmprovhost.exe may indicate lateral movement.
+  required_fields: [eventID, parentImage, image]
+  response: correlate_and_isolate
+  limitation: Sysmon Event 1 does not contain the remote source IP.
+
+- id: DET-100200
+  name: Canary File Tampering
+  rule_id: "100200"
+  data_source: Sysmon Event 11
+  mitre_attack: T1486
+  hypothesis: A write to a designated canary file may indicate ransomware activity.
+  required_fields: [eventID, targetFilename, image, processId]
+  response: preserve_evidence_then_contain
+  limitation: Security tools can touch files and must be treated as known-good writers.

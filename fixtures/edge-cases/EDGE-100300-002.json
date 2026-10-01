@@ -1,0 +1,29 @@
+{
+  "case_id": "EDGE-100300-002",
+  "kind": "edge",
+  "detection_id": "DET-100300",
+  "description": "WinRM remote PowerShell session lacks a command line",
+  "source": "sysmon",
+  "event_id": "1",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "1"
+      },
+      "eventdata": {
+        "parentImage": "C:\\\\Windows\\\\System32\\\\wsmprovhost.exe",
+        "image": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "computer": "WK01",
+        "user": "HOANG\\Administrator",
+        "processId": "4010"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100300",
+    "mitre": "T1021.006",
+    "action": "manual_review"
+  },
+  "notes": "Parent and child images are enough for the lab rule, but investigation context is incomplete."
+}

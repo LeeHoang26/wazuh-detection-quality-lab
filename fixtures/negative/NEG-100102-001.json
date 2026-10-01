@@ -1,0 +1,28 @@
+{
+  "case_id": "NEG-100102-001",
+  "kind": "negative",
+  "detection_id": "DET-100102",
+  "description": "Ordinary directory access without a replication permission GUID",
+  "source": "windows_security",
+  "event_id": "4662",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4662"
+      },
+      "eventdata": {
+        "properties": "READ_PROPERTY; WRITE_PROPERTY",
+        "subjectUserName": "helpdesk01",
+        "ipAddress": "192.0.2.20",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "A generic 4662 event is not sufficient to identify DCSync."
+}

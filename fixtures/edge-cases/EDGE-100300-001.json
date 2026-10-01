@@ -1,0 +1,29 @@
+{
+  "case_id": "EDGE-100300-001",
+  "kind": "edge",
+  "detection_id": "DET-100300",
+  "description": "WMI remote shell with no source IP in the Sysmon event",
+  "source": "sysmon",
+  "event_id": "1",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "1"
+      },
+      "eventdata": {
+        "parentImage": "C:\\\\Windows\\\\System32\\\\wbem\\\\WmiPrvSE.exe",
+        "image": "C:\\\\Windows\\\\System32\\\\cmd.exe",
+        "commandLine": "cmd.exe /Q /c whoami",
+        "computer": "WK01",
+        "processId": "3012"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100300",
+    "mitre": "T1047",
+    "action": "manual_review"
+  },
+  "notes": "Detection can fire, but source_ip_confidence is low until Event 4624 is correlated."
+}

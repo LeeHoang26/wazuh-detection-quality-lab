@@ -1,0 +1,29 @@
+{
+  "case_id": "POS-100101-001",
+  "kind": "positive",
+  "detection_id": "DET-100101",
+  "description": "AS-REP request for an account without Kerberos pre-authentication",
+  "source": "windows_security",
+  "event_id": "4768",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4768"
+      },
+      "eventdata": {
+        "preAuthType": "0",
+        "ticketEncryptionType": "0x17",
+        "targetUserName": "backupadmin",
+        "ipAddress": "192.0.2.40",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": true,
+    "rule_id": "100101",
+    "mitre": "T1558.004",
+    "action": "contain_identity_in_lab"
+  },
+  "notes": "The lab validates identity containment; production response requires an approved IAM playbook."
+}

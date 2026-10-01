@@ -1,0 +1,30 @@
+{
+  "case_id": "NEG-100300-001",
+  "kind": "negative",
+  "detection_id": "DET-100300",
+  "description": "Interactive administrator starts PowerShell from Explorer",
+  "source": "sysmon",
+  "event_id": "1",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "1"
+      },
+      "eventdata": {
+        "parentImage": "C:\\\\Windows\\\\explorer.exe",
+        "image": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "commandLine": "powershell.exe -File C:\\Admin\\backup.ps1",
+        "computer": "WK01",
+        "user": "HOANG\\Administrator",
+        "processId": "2880"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "The parent-child relationship is common for an interactive local session."
+}

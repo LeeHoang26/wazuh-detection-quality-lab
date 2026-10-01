@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "description": "Expected outcomes for the curated detection regression corpus.",
+  "cases": [
+    {
+      "case_id": "POS-100100-001",
+      "fixture": "fixtures/positive/POS-100100-001.json",
+      "kind": "positive",
+      "detection_id": "DET-100100",
+      "expected": {
+        "alert": true,
+        "rule_id": "100100",
+        "mitre": "T1558.003",
+        "action": "alert_and_investigate"
+      }
+    },
+    {
+      "case_id": "POS-100101-001",
+      "fixture": "fixtures/positive/POS-100101-001.json",
+      "kind": "positive",
+      "detection_id": "DET-100101",
+      "expected": {
+        "alert": true,
+        "rule_id": "100101",
+        "mitre": "T1558.004",
+        "action": "contain_identity_in_lab"
+      }
+    },
+    {
+      "case_id": "POS-100102-001",
+      "fixture": "fixtures/positive/POS-100102-001.json",
+      "kind": "positive",
+      "detection_id": "DET-100102",
+      "expected": {
+        "alert": true,
+        "rule_id": "100102",
+        "mitre": "T1003.006",
+        "action": "critical_investigation"
+      }
+    },
+    {
+      "case_id": "POS-100300-001",
+      "fixture": "fixtures/positive/POS-100300-001.json",
+      "kind": "positive",
+      "detection_id": "DET-100300",
+      "expected": {
+        "alert": true,
+        "rule_id": "100300",
+        "mitre": "T1047",
+        "action": "correlate_and_isolate"
+      }
+    },
+    {
+      "case_id": "POS-100200-001",
+      "fixture": "fixtures/positive/POS-100200-001.json",
+      "kind": "positive",
+      "detection_id": "DET-100200",
+      "expected": {
+        "alert": true,
+        "rule_id": "100200",
+        "mitre": "T1486",
+        "action": "suspend_dump_terminate"
+      }
+    },
+    {
+      "case_id": "NEG-100100-001",
+      "fixture": "fixtures/negative/NEG-100100-001.json",
+      "kind": "negative",
+      "detection_id": "DET-100100",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
+      "case_id": "NEG-100101-001",
+      "fixture": "fixtures/negative/NEG-100101-001.json",
+      "kind": "negative",
+      "detection_id": "DET-100101",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
+      "case_id": "NEG-100102-001",
+      "fixture": "fixtures/negative/NEG-100102-001.json",
+      "kind": "negative",
+      "detection_id": "DET-100102",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
+      "case_id": "NEG-100300-001",
+      "fixture": "fixtures/negative/NEG-100300-001.json",
+      "kind": "negative",
+      "detection_id": "DET-100300",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
+      "case_id": "NEG-100200-001",
+      "fixture": "fixtures/negative/NEG-100200-001.json",
+      "kind": "negative",
+      "detection_id": "DET-100200",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
+      "case_id": "EDGE-100300-001",
+      "fixture": "fixtures/edge-cases/EDGE-100300-001.json",
+      "kind": "edge",
+      "detection_id": "DET-100300",
+      "expected": {
+        "alert": true,
+        "rule_id": "100300",
+        "mitre": "T1047",
+        "action": "manual_review"
+      }
+    },
+    {
+      "case_id": "EDGE-100100-001",
+      "fixture": "fixtures/edge-cases/EDGE-100100-001.json",
+      "kind": "edge",
+      "detection_id": "DET-100100",
+      "expected": {
+        "alert": true,
+        "rule_id": "100100",
+        "mitre": "T1558.003",
+        "action": "manual_review"
+      }
+    },
+    {
+      "case_id": "EDGE-100102-001",
+      "fixture": "fixtures/edge-cases/EDGE-100102-001.json",
+      "kind": "edge",
+      "detection_id": "DET-100102",
+      "expected": {
+        "alert": true,
+        "rule_id": "100102",
+        "mitre": "T1003.006",
+        "action": "critical_investigation"
+      }
+    },
+    {
+      "case_id": "EDGE-100200-001",
+      "fixture": "fixtures/edge-cases/EDGE-100200-001.json",
+      "kind": "edge",
+      "detection_id": "DET-100200",
+      "expected": {
+        "alert": true,
+        "rule_id": "100200",
+        "mitre": "T1486",
+        "action": "manual_review"
+      }
+    },
+    {
+      "case_id": "EDGE-100300-002",
+      "fixture": "fixtures/edge-cases/EDGE-100300-002.json",
+      "kind": "edge",
+      "detection_id": "DET-100300",
+      "expected": {
+        "alert": true,
+        "rule_id": "100300",
+        "mitre": "T1021.006",
+        "action": "manual_review"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+reports/actual/*.json
+reports/logtest-inputs/*.json
+

@@ -1,0 +1,44 @@
+<!-- Baseline rules copied from the Active Directory Detection & Response Lab. -->
+<group name="windows,active_directory_attacks,">
+  <rule id="100100" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4769$</field>
+    <field name="win.eventdata.ticketEncryptionType">^0x17$</field>
+    <description>SOC ALERT: Active Kerberoasting Request Detected (MITRE T1558.003) targeting $(win.eventdata.serviceName) by account $(win.eventdata.targetUserName)</description>
+    <mitre><id>T1558.003</id></mitre>
+  </rule>
+  <rule id="100101" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4768$</field>
+    <field name="win.eventdata.preAuthType">^0$</field>
+    <field name="win.eventdata.ticketEncryptionType">^0x17$</field>
+    <description>SOC ALERT: AS-REP Roasting Attack Detected (MITRE T1558.004) targeting account without pre-auth $(win.eventdata.targetUserName)</description>
+    <mitre><id>T1558.004</id></mitre>
+  </rule>
+  <rule id="100102" level="14">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.properties" type="pcre2">(?i)1131f6aa-9c07-11d1-f79f-00c04fc2dcd2</field>
+    <description>SOC CRITICAL: Unauthorized DCSync Domain Replication Detected (MITRE T1003.006) initiated by $(win.eventdata.subjectUserName)</description>
+    <mitre><id>T1003.006</id></mitre>
+  </rule>
+</group>
+<group name="windows,lateral_movement,sysmon,">
+  <rule id="100300" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^1$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)wmiprvse\.exe|wsmprovhost\.exe</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(cmd|powershell|powershell_ise)\.exe</field>
+    <description>SOC CRITICAL: Lateral Movement Detected! Suspicious Remote Shell $(win.eventdata.image) spawned by Parent $(win.eventdata.parentImage) on $(win.system.computer)</description>
+    <mitre><id>T1047</id><id>T1021.006</id></mitre>
+  </rule>
+</group>
+<group name="windows,active_directory_attacks,sysmon,canary_attacks,">
+  <rule id="100200" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^11$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(_financial_payroll_2026|_confidential_contract)</field>
+    <description>SOC CRITICAL: Canary File Tampering Detected! Possible Ransomware Activity on $(win.system.computer) by Process $(win.eventdata.image) (PID: $(win.eventdata.processId))</description>
+    <mitre><id>T1486</id></mitre>
+  </rule>
+</group>

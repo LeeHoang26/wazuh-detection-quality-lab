@@ -1,0 +1,29 @@
+{
+  "case_id": "NEG-100200-001",
+  "kind": "negative",
+  "detection_id": "DET-100200",
+  "description": "Windows SearchIndexer writes to a normal document",
+  "source": "sysmon",
+  "event_id": "11",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "11"
+      },
+      "eventdata": {
+        "targetFilename": "C:\\\\Users\\\\Public\\\\report.docx",
+        "image": "C:\\\\Windows\\\\System32\\\\SearchIndexer.exe",
+        "processId": "1100",
+        "computer": "WK01",
+        "user": "NT AUTHORITY\\SYSTEM"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "The filename does not match the canary naming convention."
+}
