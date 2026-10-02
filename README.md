@@ -45,6 +45,8 @@ The screenshots below are sanitized copies of the live Wazuh result. IP addresse
 
 ![Sysmon Event 11 fields](assets/wazuh-eventchannel-fields.png)
 
+![Regression summary](assets/regression-summary.png)
+
 The raw `.evtx` files and the unedited screenshots stay outside this repository in a private evidence folder.
 
 ## Run it locally

@@ -8,7 +8,7 @@
 - JSON fixture dán vào Ruleset Test được decoder `json` đọc. Rule Windows của Manager cần decoder `windows_eventchannel`; vì vậy chỉ có Phase 2 không được chấm là rule bỏ sót.
 - Alert lịch sử trong Discover chứng minh rule đã từng chạy, nhưng không phải actual result của fixture tương tự. Không điền `reports/actual/` cho fixture nếu chính fixture chưa được gửi qua Agent.
 - Rule `100100` trên Manager quan sát ngày 2026-10-02 là level 8; file baseline trong repo là snapshot lịch sử level 12. Không coi hai bản là đồng nhất.
-- Rule `100200` chưa được nạp trên Manager khi kiểm tra, trong khi `ossec.conf` vẫn có Active Response gọi `canary-triage.cmd`. Script đó có thể suspend và terminate process lấy từ Sysmon Event 11. Cần sửa điều kiện và response trước khi bật rule canary.
+- Lúc đầu rule `100200` chưa có trên Manager, trong khi `ossec.conf` đã có Active Response gọi `canary-triage.cmd`. Sau đó candidate detection-only được nạp để live validate với Active Response vẫn tắt. Handler có thể suspend và terminate process lấy từ Sysmon Event 11, nên chưa được bật trong bài kiểm thử.
 - Live validation later loaded the detection-only candidate with Active Response disabled. It matched a real TXT Event 11 from an Explorer copy operation; this proves telemetry and rule coverage, not malicious behavior or a safe automated response.
 - Repo không tự gửi Telegram, không disable account, không block IP, không kill process và không cô lập máy.
 - Tên action trong fixture là nhãn thảo luận response, không phải lệnh được thực thi.
