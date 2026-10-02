@@ -2,11 +2,12 @@
 
 > This is a curated lab corpus. It is not a production SOC metric.
 
-- Cases: 15
+- Cases: 17
 - Offline actual comparison files: 0
-- TP: 5 | FP: 0 | FN: 0 | TN: 5
-- Precision: 100.0%
+- TP: 5 | FP: 1 | FN: 0 | TN: 6
+- Precision: 83.3%
 - Recall: 100.0%
+- Manual-review decisions (all cases): 3
 
 ## Actual Wazuh comparison
 
@@ -14,27 +15,31 @@
 
 ## Case results
 
-| Case | Kind | Expected | Offline | Actual | Offline result | Actual result | Reason |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| POS-100100-001 | positive | alert / 100100 | 100100 | - | TP | - | Event 4769 with RC4 ticket encryption |
-| POS-100101-001 | positive | alert / 100101 | 100101 | - | TP | - | Event 4768 with disabled pre-authentication and RC4 |
-| POS-100102-001 | positive | alert / 100102 | 100102 | - | TP | - | Event 4662 contains the replication GUID |
-| POS-100300-001 | positive | alert / 100300 | 100300 | - | TP | - | Suspicious remote-shell parent-child lineage |
-| POS-100200-001 | positive | alert / 100200 | 100200 | - | TP | - | Canary filename was touched |
-| NEG-100100-001 | negative | no alert / - | no alert | - | TN | - | No baseline rule condition matched |
-| NEG-100101-001 | negative | no alert / - | no alert | - | TN | - | No baseline rule condition matched |
-| NEG-100102-001 | negative | no alert / - | no alert | - | TN | - | No baseline rule condition matched |
-| NEG-100300-001 | negative | no alert / - | no alert | - | TN | - | No baseline rule condition matched |
-| NEG-100200-001 | negative | no alert / - | no alert | - | TN | - | No baseline rule condition matched |
-| EDGE-100300-001 | edge | alert / 100300 | 100300 | - | TP | - | Suspicious remote-shell parent-child lineage |
-| EDGE-100100-001 | edge | no alert / - | no alert | - | TN | - | Manual review: Kerberos identity or source context is incomplete |
-| EDGE-100102-001 | edge | alert / 100102 | 100102 | - | TP | - | Event 4662 contains the replication GUID |
-| EDGE-100200-001 | edge | no alert / - | no alert | - | TN | - | Suppressed: known-good security or indexing process touched the canary |
-| EDGE-100300-002 | edge | no alert / - | no alert | - | TN | - | Manual review: remote shell command line is missing |
+| Case | Kind | Expected | Offline | Actual | Offline result | Actual result | Decision | Reason |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| POS-100100-001 | positive | alert / 100100 | 100100 | - | TP | - | investigate | Event 4769 with RC4 ticket encryption |
+| POS-100101-001 | positive | alert / 100101 | 100101 | - | TP | - | investigate | Event 4768 with disabled pre-authentication and RC4 |
+| POS-100102-001 | positive | alert / 100102 | 100102 | - | TP | - | investigate | Event 4662 contains the replication GUID |
+| POS-100300-001 | positive | alert / 100300 | 100300 | - | TP | - | investigate | Suspicious remote-shell parent-child lineage |
+| POS-100200-001 | positive | alert / 100200 | 100200 | - | TP | - | investigate | Canary filename was touched |
+| NEG-100100-001 | negative | no alert / - | no alert | - | TN | - | no_alert | No baseline rule condition matched |
+| NEG-100101-001 | negative | no alert / - | no alert | - | TN | - | no_alert | No baseline rule condition matched |
+| NEG-100102-001 | negative | no alert / - | no alert | - | TN | - | no_alert | No baseline rule condition matched |
+| NEG-100102-002 | negative | no alert / - | 100102 | - | FP | - | manual_review | Alert retained: lab DC identity and SYSTEM context; legitimacy remains unverified |
+| NEG-100300-001 | negative | no alert / - | no alert | - | TN | - | no_alert | No baseline rule condition matched |
+| NEG-100200-001 | negative | no alert / - | no alert | - | TN | - | no_alert | No baseline rule condition matched |
+| NEG-100200-002 | negative | no alert / - | no alert | - | TN | - | no_alert | Outside canary scope: Recent-items shortcut, not the protected TXT file |
+| EDGE-100300-001 | edge | alert / 100300 | 100300 | - | TP | - | investigate | Suspicious remote-shell parent-child lineage |
+| EDGE-100100-001 | edge | no alert / - | no alert | - | TN | - | manual_review | Manual review: Kerberos identity or source context is incomplete |
+| EDGE-100102-001 | edge | alert / 100102 | 100102 | - | TP | - | investigate | Event 4662 contains the replication GUID |
+| EDGE-100200-001 | edge | no alert / - | no alert | - | TN | - | no_alert | Suppressed: known-good security or indexing process touched the canary |
+| EDGE-100300-002 | edge | no alert / - | no alert | - | TN | - | manual_review | Manual review: remote shell command line is missing |
 
 ## Interpretation
 
-- Baseline profile mirrors the existing Wazuh field conditions.
+- Baseline profile approximates the historical rule snapshot in this repository; it is not the live Manager ruleset.
 - Safety profile adds context checks for incomplete Kerberos/lateral-movement events and known-good canary writers.
+- The DC review candidate retains rule 100102. Manual review is not suppression and does not improve detection precision or recall.
+- The safety candidate excludes the named Recent-items shortcut from canary detection, regardless of process name. This is not a general shortcut or Explorer allowlist.
 - Edge cases are useful for manual-review decisions and are not mixed into the precision/recall denominator.
-- Actual Wazuh results must be recorded separately with `wazuh-logtest`.
+- Actual Wazuh results require the exact fixture to pass through a Windows Agent and be checked in Discover; pasted JSON only checks the generic decoder.

@@ -26,7 +26,7 @@
   hypothesis: Directory replication access by an unexpected identity may indicate DCSync.
   required_fields: [eventID, properties, subjectUserName]
   response: critical_investigation
-  limitation: The lab checks the replication GUID but does not establish whether the caller is an approved DC.
+  limitation: The baseline does not establish caller authorization. The offline safety candidate retains the alert and marks one explicit lab identity and host tuple for manual review; it does not approve or suppress DC accounts.
 
 - id: DET-100300
   name: WMI or WinRM Remote Shell

@@ -11,7 +11,7 @@ import json
 import re
 import sys
 from collections import Counter
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +52,11 @@ def safety_match(fixture: dict[str, Any]) -> tuple[str | None, str]:
         return None, "Manual review: Kerberos identity or source context is incomplete"
     if rule_id == "100300" and not data.get("commandLine"):
         return None, "Manual review: remote shell command line is missing"
+    target = PureWindowsPath(str(data.get("targetFilename", "")))
+    if (rule_id == "100200"
+            and target.name.casefold() == "!_financial_payroll_2026.txt.lnk"
+            and target.parent.match(r"C:\Users\*\AppData\Roaming\Microsoft\Windows\Recent")):
+        return None, "Outside canary scope: Recent-items shortcut, not the protected TXT file"
     if rule_id == "100200" and re.search(r"(?i)(MsMpEng|MpCmdRun|SearchIndexer|SearchProtocolHost|vssvc)\.exe", str(data.get("image", ""))):
         return None, "Suppressed: known-good security or indexing process touched the canary"
     return rule_id, reason
@@ -70,6 +75,22 @@ def expected_for_profile(fixture: dict[str, Any], profile: str) -> dict[str, Any
     if baseline_rule == "100200" and re.search(r"(?i)(MsMpEng|MpCmdRun|SearchIndexer|SearchProtocolHost|vssvc)\.exe", str(data.get("image", ""))):
         expected.update(alert=False, rule_id=None, action="no_alert")
     return expected
+
+
+def triage_decision(fixture: dict[str, Any], profile: str, rule_id: str | None, reason: str) -> tuple[str, str]:
+    data = eventdata(fixture)
+    system = fixture.get("data", {}).get("win", {}).get("system", {})
+    computer = system.get("computer", data.get("computer", ""))
+    # This tuple identifies a synthetic review candidate, not a trusted identity.
+    if (profile == "safety" and rule_id == "100102"
+            and str(data.get("subjectUserName", "")).upper() == "DC01$"
+            and data.get("subjectUserSid") == "S-1-5-18"
+            and str(data.get("subjectDomainName", "")).upper() == "LAB"
+            and str(computer).upper() in {"DC01", "DC01.LAB.LOCAL"}):
+        return "manual_review", "Alert retained: lab DC identity and SYSTEM context; legitimacy remains unverified"
+    if reason.startswith("Manual review:"):
+        return "manual_review", reason
+    return ("investigate" if rule_id else "no_alert"), reason
 
 
 def load_actual(actual_dir: Path | None, case_id: str) -> dict[str, Any] | None:
@@ -126,6 +147,7 @@ def markdown_report(profile: str, rows: list[dict[str, Any]], actual_count: int)
         f"- TP: {tp} | FP: {fp} | FN: {fn} | TN: {tn}",
         f"- Precision: {precision:.1%}",
         f"- Recall: {recall:.1%}",
+        f"- Manual-review decisions (all cases): {sum(row['decision'] == 'manual_review' for row in rows)}",
         "",
         "## Actual Wazuh comparison",
         "",
@@ -143,23 +165,25 @@ def markdown_report(profile: str, rows: list[dict[str, Any]], actual_count: int)
         "",
         "## Case results",
         "",
-        "| Case | Kind | Expected | Offline | Actual | Offline result | Actual result | Reason |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| Case | Kind | Expected | Offline | Actual | Offline result | Actual result | Decision | Reason |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for row in rows:
         expected = "alert" if row["expected_alert"] else "no alert"
         offline = row["predicted_rule"] or "no alert"
         actual = row["actual_rule"] or "-"
         actual_result = row["actual_outcome"] or "-"
-        lines.append(f"| {row['case_id']} | {row['kind']} | {expected} / {row['expected_rule'] or '-'} | {offline} | {actual} | {row['offline_outcome']} | {actual_result} | {row['reason']} |")
+        lines.append(f"| {row['case_id']} | {row['kind']} | {expected} / {row['expected_rule'] or '-'} | {offline} | {actual} | {row['offline_outcome']} | {actual_result} | {row['decision']} | {row['reason']} |")
     lines += [
         "",
         "## Interpretation",
         "",
-        "- Baseline profile mirrors the existing Wazuh field conditions.",
+        "- Baseline profile approximates the historical rule snapshot in this repository; it is not the live Manager ruleset.",
         "- Safety profile adds context checks for incomplete Kerberos/lateral-movement events and known-good canary writers.",
+        "- The DC review candidate retains rule 100102. Manual review is not suppression and does not improve detection precision or recall.",
+        "- The safety candidate excludes the named Recent-items shortcut from canary detection, regardless of process name. This is not a general shortcut or Explorer allowlist.",
         "- Edge cases are useful for manual-review decisions and are not mixed into the precision/recall denominator.",
-        "- Actual Wazuh results must be recorded separately with `wazuh-logtest`.",
+        "- Actual Wazuh results require the exact fixture to pass through a Windows Agent and be checked in Discover; pasted JSON only checks the generic decoder.",
         "",
     ]
     return "\n".join(lines)
@@ -177,6 +201,7 @@ def main() -> int:
         fixture = json.loads((ROOT / item["fixture"]).read_text(encoding="utf-8-sig"))
         matcher = baseline_match if args.profile == "baseline" else safety_match
         predicted_rule, reason = matcher(fixture)
+        decision, reason = triage_decision(fixture, args.profile, predicted_rule, reason)
         expected = expected_for_profile(fixture, args.profile)
         actual = load_actual(args.actual_dir, item["case_id"])
         rows.append({
@@ -186,6 +211,7 @@ def main() -> int:
             "expected_rule": expected.get("rule_id"),
             "predicted_rule": predicted_rule,
             "reason": reason,
+            "decision": decision,
             "offline_outcome": outcome(predicted_rule, expected),
             "actual": actual,
             "actual_rule": actual_rule(actual),

@@ -2,6 +2,20 @@
 
 Tài liệu này viết cho người mới. Anh cứ làm đúng thứ tự, chạy từng lệnh một, không cần tự đoán bước tiếp theo.
 
+## Đọc trước khi bắt đầu
+
+Bản hướng dẫn chính là file Word riêng được giao bên ngoài repository. Bản Word giải thích theo kiểu thực hành thủ công: bấm ở đâu, nhìn field nào, cần chụp ảnh gì và xử lý khi kết quả chưa đúng. File Word không được đưa vào repo portfolio.
+
+Không bắt đầu bằng Python. Thứ tự nên làm là:
+
+1. Mở Word manual và làm phần snapshot, mạng VMware, Event Viewer.
+2. Kiểm tra Wazuh Manager, Agent và Sysmon.
+3. Xem alert thật trong Wazuh Discover, đối chiếu Event ID, field và rule ID.
+4. Dùng Ruleset Test để xem JSON fixture được decode ra field nào; không coi Phase 2 là rule đã match.
+5. Chỉ sau đó mới dùng Python để tạo report và đối chiếu kết quả.
+
+File JSON và report có sẵn trong repo chỉ là dữ liệu chuẩn bị. Chúng không thay thế screenshot và kết quả Wazuh thật.
+
 ## 1. Repo này dùng để làm gì?
 
 Repo này không phải một hệ thống tấn công và cũng không phải một SOAR tự động xử lý máy tính. Nó trả lời một câu hỏi trong công việc SOC:
@@ -20,7 +34,7 @@ Anh có thể chạy phần offline mà không mở VMware. Muốn kiểm tra th
 
 | Máy ảo | Vai trò | Có bắt buộc không? |
 | --- | --- | --- |
-| `SIEM-SRV` - Ubuntu + Wazuh Manager | Nhận log, chứa rule, chạy `wazuh-logtest` | Bắt buộc khi test thật |
+| `SIEM-SRV` - Ubuntu + Wazuh Manager | Nhận log, chứa rule, chạy Dashboard/Ruleset Test | Bắt buộc khi test thật |
 | `DC01` - Windows Server + Active Directory | Tạo Windows Security Event 4768, 4769, 4662 | Cần cho bài AD thật |
 | `WK01` - Windows + Sysmon + Wazuh Agent | Tạo Sysmon Event 1 và 11 | Cần cho bài process/file thật |
 | `KALI` - Kali Linux | Máy mô phỏng nguồn tấn công | Không bắt buộc; chỉ mở khi cần tái tạo hoạt động |
@@ -64,11 +78,11 @@ ipconfig
 
 Nếu các máy không ping được nhau, dừng ở đây và sửa mạng trước. Không nên tiếp tục cấu hình Wazuh khi nền mạng chưa thông.
 
-## 4. Mở máy ảo theo thứ tự
+## 4. Mở và kiểm tra máy ảo theo thứ tự
 
-### 4.1. Chạy offline trước, không cần VMware
+### 4.1. Python offline là phần phụ, chạy sau khi đã hiểu thủ công
 
-Đây là bước an toàn nhất và cũng là bước bắt buộc đầu tiên.
+Phần này không bắt buộc để hiểu Wazuh. Chạy sau khi anh đã xem Event Viewer và alert thật trong Discover. Đây là cách tạo lại fixture và report bằng máy tính, không phải kết quả Wazuh thật.
 
 Mở PowerShell trên máy thật, chạy:
 
@@ -101,8 +115,8 @@ python scripts\run_regression.py --profile safety
 Kết quả đúng sẽ có dòng gần giống:
 
 ```text
-FIXTURE VALIDATION PASSED: 15 cases
-positive=5 negative=5 edge=5
+FIXTURE VALIDATION PASSED: 17 cases
+positive=5 negative=7 edge=5
 ```
 
 Các file quan trọng được tạo ra:
@@ -154,51 +168,15 @@ Get-Service Sysmon*
 
 Nếu service là `Running` thì máy đang gửi telemetry theo cấu hình cũ. Không cần cài lại nếu lab flagship đã hoạt động.
 
-## 5. Cài rule baseline lên Wazuh Manager
+## 5. Đối chiếu rule đang chạy
 
-Chỉ làm bước này nếu rule `100100`, `100101`, `100102`, `100200`, `100300` chưa có trên `SIEM-SRV`.
+Trên Wazuh Dashboard vào `Server management > Rules`, tìm từng ID `100100`, `100101`, `100102`, `100200`, `100300` và ghi lại level, mô tả, tên file. Chỉ đọc, không bấm Save.
 
-Trước tiên kiểm tra:
+Ngày 2026-10-02, Manager đã có `100100` level 8, `100101`, `100102`, `100300`, nhưng chưa có `100200`. File `detections/wazuh/baseline-rules.xml` trong repo là snapshot lịch sử, không trùng hoàn toàn với Manager hiện tại.
 
-```bash
-sudo grep -R -n 'id="100100"\|id="100101"\|id="100102"\|id="100200"\|id="100300"' /var/ossec/etc/rules/
-```
+Đặc biệt, `ossec.conf` đã có Active Response gắn ID `100200` với `canary-triage.cmd`; script PowerShell phía sau có thể suspend và terminate process dựa trên Sysmon Event 11. Một file `.lnk` hợp lệ do Explorer tạo cũng chứa tên canary. Vì vậy không thêm rule `100200` trong bước này.
 
-Nếu đã thấy các rule này trong output, không dán thêm lần nữa. Rule trùng ID có thể làm Wazuh báo lỗi.
-
-Nếu chưa có, mở file rule local:
-
-```bash
-sudo cp /var/ossec/etc/rules/local_rules.xml /var/ossec/etc/rules/local_rules.xml.bak
-sudo nano /var/ossec/etc/rules/local_rules.xml
-```
-
-Mở file `detections/wazuh/baseline-rules.xml` trên máy thật, copy nội dung các block `<group>...</group>` rồi dán vào cuối `local_rules.xml`. Không dán thêm một XML header thứ hai.
-
-Trong `nano`:
-
-- `Ctrl+O`, Enter để lưu.
-- `Ctrl+X` để thoát.
-
-Kiểm tra cấu hình trước khi restart:
-
-```bash
-sudo /var/ossec/bin/wazuh-analysisd -t
-```
-
-Nếu không có lỗi nghiêm trọng, restart:
-
-```bash
-sudo systemctl restart wazuh-manager
-```
-
-Sau đó kiểm tra lại:
-
-```bash
-sudo systemctl is-active wazuh-manager
-```
-
-## 6. Đưa fixture vào `wazuh-logtest`
+## 6. Kiểm tra decoder và rule đúng cách
 
 ### 6.1. Tạo file event để dán
 
@@ -208,7 +186,7 @@ Trên máy thật, trong thư mục repo chạy lại:
 python scripts\export_logtest_events.py
 ```
 
-Mỗi file trong `reports\logtest-inputs\` chỉ chứa phần event Wazuh cần đọc, không chứa metadata của fixture.
+Mỗi file trong `reports\logtest-inputs\` chỉ chứa phần JSON để kiểm tra field decoder, không chứa metadata của fixture. File này không mang metadata EventChannel của Wazuh Agent.
 
 Ví dụ xem một event:
 
@@ -226,36 +204,31 @@ Trên Ubuntu `SIEM-SRV`:
 sudo /var/ossec/bin/wazuh-logtest
 ```
 
-Dán một event vào cửa sổ Terminal rồi nhấn Enter. Chỉ dán một event mỗi lần. Wazuh sẽ in ra decoder, rule ID và level nếu rule khớp.
+Dán một event vào cửa sổ Terminal rồi nhấn Enter. Chỉ dán một event mỗi lần. Với fixture JSON tối giản hiện tại, kết quả có thể dừng ở `Phase 2: json` và không có Phase 3. Đó là kết quả decoder, **không phải false negative** của rule `100100`.
 
-Ví dụ với `POS-100100-001`, kết quả mong đợi là rule `100100`. Ghi lại ba thông tin:
+Lý do: rule Windows của Wazuh yêu cầu nhóm `windows`; base rule của nhóm này dựa trên decoder `windows_eventchannel`. JSON dán tay được decoder `json` đọc, nên không đi cùng đường xử lý với event Windows do Agent gửi thật.
 
-```text
-case_id: POS-100100-001
-alert: true
-rule_id: 100100
-level: 12
-```
+Để xác nhận rule đang chạy, mở Wazuh Dashboard > Explore > Discover, chọn `wazuh-alerts-*`, chọn khoảng thời gian chứa event và tìm `rule.id: 100101`, `rule.id: 100102` hoặc `rule.id: 100300`. Mở một alert và đọc Event ID, field, agent, rule ID, level. Với rule không có alert, ghi `chưa quan sát được alert trong khoảng thời gian này`; không tự ghi `no alert` cho một fixture chưa đi qua Agent.
 
 Để thoát `wazuh-logtest`, nhấn `Ctrl+C`.
 
-Làm tương tự cho cả 15 file nếu muốn có bộ đo đầy đủ. Tối thiểu nên test một positive, một negative và một edge case để hiểu ba loại kết quả.
+Các fixture vẫn có ích cho offline regression. Muốn tính actual TP/FP/FN/TN cho đúng 17 case, phải đưa chính các event đó qua đường Windows EventChannel và xác nhận kết quả từng case. Không dùng alert lịch sử của một event tương tự để thay cho fixture.
 
 ## 7. Ghi kết quả Wazuh thật vào report
 
-Quay lại PowerShell tại thư mục repo. Ví dụ Wazuh trả về alert rule `100100` cho case đầu tiên:
+Chỉ làm phần này sau khi chính fixture đã được phát qua Agent và được Wazuh xử lý. Ví dụ nếu rule `100100` của Manager hiện tại trả về level 8 cho case đầu tiên:
 
 ```powershell
-python scripts\record_actual.py --case-id POS-100100-001 --alert --rule-id 100100 --level 12 --notes 'Matched in wazuh-logtest'
+python scripts\record_actual.py --case-id POS-100100-001 --alert --rule-id 100100 --level 8 --notes 'Verified with agent-collected event'
 ```
 
-Ví dụ Wazuh không tạo alert cho case bình thường:
+Ví dụ Wazuh không tạo alert cho chính case bình thường đã được gửi qua Agent:
 
 ```powershell
-python scripts\record_actual.py --case-id NEG-100100-001 --no-alert --notes 'No matching rule in wazuh-logtest'
+python scripts\record_actual.py --case-id NEG-100100-001 --no-alert --notes 'Verified with agent-collected event'
 ```
 
-Lặp lại cho từng case đã test. Sau đó chạy report có so sánh kết quả thật:
+Chỉ dùng các lệnh trên nếu **chính fixture đó** đã đi qua Windows Agent và được kiểm tra trong Discover. Alert lịch sử có field tương tự không được gán vào case ID này. Sau đó chạy report có so sánh kết quả thật:
 
 ```powershell
 python scripts\run_regression.py --profile baseline --actual-dir reports\actual
@@ -334,15 +307,18 @@ Set-Location 'E:\LABS FOR FRESHER\soc-detection-quality-and-regression-lab'
 
 Rồi chạy lại lệnh.
 
+### Ruleset Test chỉ hiện Phase 2
+
+Nếu decoder là `json`, đây là kết quả kiểm tra field. Rule Windows cần decoder `windows_eventchannel`, nên không có Phase 3 không chứng minh rule bỏ sót. Dùng alert thật trong Discover để xác nhận rule đang chạy.
+
 ### Wazuh không trả về rule 100100...
 
 Kiểm tra lần lượt:
 
 1. Rule đã có trong `/var/ossec/etc/rules/` chưa.
 2. ID có bị trùng không.
-3. `wazuh-analysisd -t` có báo lỗi không.
-4. Manager đã restart sau khi sửa rule chưa.
-5. Event dán vào có đúng một dòng JSON và đúng field không.
+3. Alert thật trong Discover có đúng Event ID và field không.
+4. Ruleset Test có đang dùng decoder `json` thay vì `windows_eventchannel` không.
 
 ### Wazuh alert nhưng khác rule mong đợi
 
@@ -360,20 +336,21 @@ python scripts\validate_fixtures.py
 ## 11. Checklist hoàn thành
 
 - [ ] Chạy được generator.
-- [ ] Validator báo 15 cases.
+- [ ] Validator báo 17 cases.
 - [ ] Có baseline report.
 - [ ] Có safety report.
 - [ ] Hiểu positive, negative và edge case.
 - [ ] `SIEM-SRV` chạy Wazuh Manager.
 - [ ] Đã kiểm tra rule không bị trùng.
-- [ ] Đã chạy ít nhất 3 event qua `wazuh-logtest`.
-- [ ] Đã ghi actual result cho các case đã test.
+- [ ] Đã xem decoder của một fixture trong Ruleset Test và hiểu vì sao Phase 3 có thể vắng mặt.
+- [ ] Đã xem ít nhất một alert thật của Agent trong Discover.
+- [ ] Chỉ ghi actual result cho fixture đã được đưa qua Agent thật.
 - [ ] Đã đọc cột Offline và Actual trong report.
 
 ## 12. Cách nói khi phỏng vấn
 
 Anh có thể trình bày ngắn như sau:
 
-> “I reused my AD and Wazuh detection hypotheses and built a dependency-free regression harness. It tests positive, negative, and edge-case telemetry, reports TP, FP, FN, TN, precision and recall, and compares offline predictions with real `wazuh-logtest` results. I also separated manual review from destructive response when context is incomplete or a known-good process touches a canary file.”
+> “I reused my AD and Wazuh detection hypotheses and built a dependency-free regression harness. It tests positive, negative, and edge-case telemetry, reports TP, FP, FN, TN, precision and recall, and compares offline predictions with real Windows EventChannel alerts in Wazuh Discover. I also separated manual review from destructive response when context is incomplete or a known-good process touches a canary file.”
 
 Điểm quan trọng là nói đúng những gì anh đã chạy và có report chứng minh.

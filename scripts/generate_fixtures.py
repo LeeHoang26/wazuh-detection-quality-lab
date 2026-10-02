@@ -118,6 +118,14 @@ CASES = [
         "A generic 4662 event is not sufficient to identify DCSync.",
     ),
     case(
+        "NEG-100102-002", "negative", "DET-100102",
+        "Known Domain Controller self-replication",
+        "windows_security", "4662",
+        {"properties": f"{REPLICATION_GUID}; CONTROL_ACCESS", "subjectUserName": "DC01$", "subjectUserSid": "S-1-5-18", "subjectDomainName": "LAB", "computer": "DC01"},
+        False, None, None, "no_alert",
+        "Based on five real rule 100102 alerts from DC01$ in the lab. Confirm the DC identity and replication context before suppressing; a compromised DC can also replicate.",
+    ),
+    case(
         "NEG-100300-001", "negative", "DET-100300",
         "Interactive administrator starts PowerShell from Explorer",
         "sysmon", "1",
@@ -132,6 +140,14 @@ CASES = [
         {"targetFilename": r"C:\\Users\\Public\\report.docx", "image": r"C:\\Windows\\System32\\SearchIndexer.exe", "processId": "1100", "computer": "WK01", "user": "NT AUTHORITY\\SYSTEM"},
         False, None, None, "no_alert",
         "The filename does not match the canary naming convention.",
+    ),
+    case(
+        "NEG-100200-002", "negative", "DET-100200",
+        "Recent-items shortcut has the canary name but is not the canary file",
+        "sysmon", "11",
+        {"targetFilename": r"C:\Users\labuser\AppData\Roaming\Microsoft\Windows\Recent\!_financial_payroll_2026.txt.lnk", "image": r"C:\Windows\Explorer.EXE", "processId": "1148", "computer": "WK01", "user": "LAB\\labuser"},
+        False, None, None, "no_alert",
+        "Sanitized reconstruction of WK01 Sysmon record 8390, 2026-09-20T07:05:33.2316129Z. Expected no canary-tampering alert: the target is a shortcut, not the protected TXT file. No actual Wazuh 100200 match was observed; see docs/canary-shortcut-case-study.md. This label does not classify every shortcut as benign.",
     ),
     case(
         "EDGE-100300-001", "edge", "DET-100300",

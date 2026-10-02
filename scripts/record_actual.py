@@ -1,4 +1,4 @@
-"""Record one sanitized result returned by wazuh-logtest."""
+"""Record a result verified after the exact fixture passes through an Agent."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ OUTPUT = ROOT / "reports" / "actual"
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Save a sanitized wazuh-logtest result.")
+    parser = argparse.ArgumentParser(description="Save an Agent-verified Wazuh result for one exact fixture.")
     parser.add_argument("--case-id", required=True)
     state = parser.add_mutually_exclusive_group(required=True)
     state.add_argument("--alert", action="store_true")

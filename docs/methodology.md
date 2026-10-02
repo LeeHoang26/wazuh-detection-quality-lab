@@ -8,9 +8,11 @@ Lab dùng cùng một bộ dữ liệu nhỏ để kiểm tra ba câu hỏi:
 2. Rule có báo nhầm trên hoạt động bình thường không?
 3. Khi dữ liệu thiếu hoặc có process hợp lệ chạm canary, hệ thống có tránh quyết định quá mạnh không?
 
-## Bộ dữ liệu 15 case
+## Bộ dữ liệu 17 case
 
-Bộ test gồm 5 positive, 5 negative và 5 edge case. Mỗi case có ID cố định, event ID, field đầu vào và expected outcome. Nhờ vậy anh có thể chạy lại sau khi sửa rule mà không đổi tiêu chuẩn giữa các lần đo.
+Bộ test gồm 5 positive, 7 negative và 5 edge case. Case negative thứ sáu mô phỏng tình huống `DC01$` là Domain Controller được phê duyệt và tự replication; mẫu này được thêm sau khi quan sát năm alert cùng tài khoản trong lab. Tính hợp lệ của từng alert thật vẫn cần xác minh riêng. Case thứ bảy dựng lại Sysmon record 8390 có mục tiêu là shortcut `.lnk`, không phải canary `.txt`; xem [nguồn và giới hạn](canary-shortcut-case-study.md). Mỗi case có ID cố định, event ID, field đầu vào và expected outcome.
+
+So sánh baseline và safety trên cùng 17 case: baseline có 2 FP, safety còn 1 FP. Việc thêm case làm baseline precision giảm từ 83,3% trên bộ 16 case cũ xuống 71,4%; đây là thay đổi phạm vi đo, không phải code baseline bị hỏng. Safety đạt 83,3% trên bộ mới vì loại đúng shortcut đã định nghĩa. Không thay đổi nhãn expected của case shortcut để làm đẹp kết quả.
 
 Các fixture là dữ liệu mô phỏng đã làm sạch. Chúng không phải log lấy từ một nạn nhân thật và không chứa credential thật.
 
@@ -40,6 +42,6 @@ Safety profile là mô hình kiểm thử chất lượng, không phải product
 
 ## Actual Wazuh
 
-Khi có file trong `reports/actual/`, runner so sánh thêm rule ID thật từ `wazuh-logtest`. File actual không được commit vì có thể chứa output môi trường cá nhân; `.gitignore` đã bỏ qua thư mục đó.
+Khi có file trong `reports/actual/`, runner so sánh thêm rule ID thật từ event đã đi qua Windows Agent và được kiểm tra trong Discover. JSON dán vào Ruleset Test chỉ chứng minh decoder `json` đọc được field; nó không tạo được kết quả actual của rule Windows cần `windows_eventchannel`. File actual không được commit vì có thể chứa output môi trường cá nhân; `.gitignore` đã bỏ qua thư mục đó.
 
 Offline result cho biết logic kiểm thử local hoạt động thế nào. Actual result cho biết Wazuh Manager trong VMware thực sự decode và match thế nào. Hai kết quả có thể khác, và sự khác biệt đó chính là dữ liệu tuning có ích.

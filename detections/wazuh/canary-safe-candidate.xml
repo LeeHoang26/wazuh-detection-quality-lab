@@ -1,0 +1,14 @@
+<!--
+  Detection-only candidate for the canary case study.
+  Install only after checking the live rule ID and keep canary Active Response disabled.
+  The final .txt requirement deliberately excludes Recent-items .txt.lnk shortcuts.
+-->
+<group name="windows,sysmon,canary_attacks,">
+  <rule id="100200" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^11$</field>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?i)(?:^|[\\/])!(?:_financial_payroll_2026|_confidential_contract)\.txt$</field>
+    <description>SOC ALERT: Protected canary TXT file touched on $(win.system.computer) by $(win.eventdata.image) (PID: $(win.eventdata.processId))</description>
+    <mitre><id>T1486</id></mitre>
+  </rule>
+</group>

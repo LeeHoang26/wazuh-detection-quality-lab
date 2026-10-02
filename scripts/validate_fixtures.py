@@ -66,7 +66,7 @@ def main() -> int:
             if pattern.search(raw):
                 fail(f"{case_id}: possible secret pattern found", errors)
 
-    expected_counts = {"positive": 5, "negative": 5, "edge": 5}
+    expected_counts = {"positive": 5, "negative": 7, "edge": 5}
     actual_counts = {kind: sum(1 for item in cases if item.get("kind") == kind) for kind in expected_counts}
     for kind, expected_count in expected_counts.items():
         if actual_counts[kind] != expected_count:

@@ -1,0 +1,29 @@
+{
+  "case_id": "NEG-100200-002",
+  "kind": "negative",
+  "detection_id": "DET-100200",
+  "description": "Recent-items shortcut has the canary name but is not the canary file",
+  "source": "sysmon",
+  "event_id": "11",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "11"
+      },
+      "eventdata": {
+        "targetFilename": "C:\\Users\\labuser\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\!_financial_payroll_2026.txt.lnk",
+        "image": "C:\\Windows\\Explorer.EXE",
+        "processId": "1148",
+        "computer": "WK01",
+        "user": "LAB\\labuser"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "Sanitized reconstruction of WK01 Sysmon record 8390, 2026-09-20T07:05:33.2316129Z. Expected no canary-tampering alert: the target is a shortcut, not the protected TXT file. No actual Wazuh 100200 match was observed; see docs/canary-shortcut-case-study.md. This label does not classify every shortcut as benign."
+}

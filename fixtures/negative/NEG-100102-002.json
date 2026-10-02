@@ -1,0 +1,29 @@
+{
+  "case_id": "NEG-100102-002",
+  "kind": "negative",
+  "detection_id": "DET-100102",
+  "description": "Known Domain Controller self-replication",
+  "source": "windows_security",
+  "event_id": "4662",
+  "data": {
+    "win": {
+      "system": {
+        "eventID": "4662"
+      },
+      "eventdata": {
+        "properties": "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2; CONTROL_ACCESS",
+        "subjectUserName": "DC01$",
+        "subjectUserSid": "S-1-5-18",
+        "subjectDomainName": "LAB",
+        "computer": "DC01"
+      }
+    }
+  },
+  "expected": {
+    "alert": false,
+    "rule_id": null,
+    "mitre": null,
+    "action": "no_alert"
+  },
+  "notes": "Based on five real rule 100102 alerts from DC01$ in the lab. Confirm the DC identity and replication context before suppressing; a compromised DC can also replicate."
+}

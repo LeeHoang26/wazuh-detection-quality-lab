@@ -99,6 +99,18 @@
       }
     },
     {
+      "case_id": "NEG-100102-002",
+      "fixture": "fixtures/negative/NEG-100102-002.json",
+      "kind": "negative",
+      "detection_id": "DET-100102",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
       "case_id": "NEG-100300-001",
       "fixture": "fixtures/negative/NEG-100300-001.json",
       "kind": "negative",
@@ -113,6 +125,18 @@
     {
       "case_id": "NEG-100200-001",
       "fixture": "fixtures/negative/NEG-100200-001.json",
+      "kind": "negative",
+      "detection_id": "DET-100200",
+      "expected": {
+        "alert": false,
+        "rule_id": null,
+        "mitre": null,
+        "action": "no_alert"
+      }
+    },
+    {
+      "case_id": "NEG-100200-002",
+      "fixture": "fixtures/negative/NEG-100200-002.json",
       "kind": "negative",
       "detection_id": "DET-100200",
       "expected": {

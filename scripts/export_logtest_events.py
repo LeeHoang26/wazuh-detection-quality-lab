@@ -1,4 +1,4 @@
-"""Export only the Wazuh event body from each fixture for wazuh-logtest."""
+"""Export fixture JSON for decoder inspection, not EventChannel rule validation."""
 
 from __future__ import annotations
 
@@ -17,7 +17,8 @@ def main() -> None:
         fixture = json.loads((ROOT / item["fixture"]).read_text(encoding="utf-8-sig"))
         output_path = OUTPUT / f"{item['case_id']}.json"
         output_path.write_text(json.dumps(fixture["data"], separators=(",", ":")) + "\n", encoding="utf-8")
-    print(f"exported {len(manifest['cases'])} wazuh-logtest inputs to {OUTPUT}")
+    print(f"exported {len(manifest['cases'])} JSON decoder inputs to {OUTPUT}")
+    print("Note: pasted JSON uses the json decoder, not the Windows EventChannel decoder.")
 
 
 if __name__ == "__main__":
