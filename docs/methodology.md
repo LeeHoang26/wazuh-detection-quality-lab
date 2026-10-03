@@ -1,47 +1,45 @@
-# Phương pháp đo
+# How the tests are scored
 
-## Mục tiêu
+## What I wanted to know
 
-Lab dùng cùng một bộ dữ liệu nhỏ để kiểm tra ba câu hỏi:
+I use the same small corpus to ask three questions:
 
-1. Rule có bắt được mẫu đáng ngờ không?
-2. Rule có báo nhầm trên hoạt động bình thường không?
-3. Khi dữ liệu thiếu hoặc có process hợp lệ chạm canary, hệ thống có tránh quyết định quá mạnh không?
+1. Does the rule catch the suspicious activity it was written for?
+2. Does it also fire on normal activity?
+3. When context is missing or a legitimate process touches a canary, does the response decision remain cautious?
 
-## Bộ dữ liệu 17 case
+## The 17-case corpus
 
-Bộ test gồm 5 positive, 7 negative và 5 edge case. Case negative thứ sáu mô phỏng tình huống `DC01$` là Domain Controller được phê duyệt và tự replication; mẫu này được thêm sau khi quan sát năm alert cùng tài khoản trong lab. Tính hợp lệ của từng alert thật vẫn cần xác minh riêng. Case thứ bảy dựng lại Sysmon record 8390 có mục tiêu là shortcut `.lnk`, không phải canary `.txt`; xem [nguồn và giới hạn](canary-shortcut-case-study.md). Mỗi case có ID cố định, event ID, field đầu vào và expected outcome.
+There are 5 positive, 7 negative, and 5 edge cases. The sixth negative case models an approved Domain Controller, `DC01$`, performing replication. I added it after seeing five alerts involving that account in the lab; each real alert still needs its own investigation before it can be called benign. The seventh negative case recreates Sysmon record 8390, whose target was a `.lnk` shortcut rather than the protected `.txt` file. See the [source and limitations](canary-shortcut-case-study.md). Every case has a stable ID, event ID, input fields, and expected outcome.
 
-So sánh baseline và safety trên cùng 17 case: baseline có 2 FP, safety còn 1 FP. Việc thêm case làm baseline precision giảm từ 83,3% trên bộ 16 case cũ xuống 71,4%; đây là thay đổi phạm vi đo, không phải code baseline bị hỏng. Safety đạt 83,3% trên bộ mới vì loại đúng shortcut đã định nghĩa. Không thay đổi nhãn expected của case shortcut để làm đẹp kết quả.
+Both profiles run against the same 17 cases. The baseline has 2 false positives; the safety candidate has 1. Adding the shortcut case changed baseline precision from 83.3% on the earlier 16-case corpus to 71.4% on this corpus. That is a change in what was measured, not a regression in baseline code. The safety candidate reaches 83.3% by excluding the defined shortcut. I did not change the shortcut's expected label to improve the score.
 
-Các fixture là dữ liệu mô phỏng đã làm sạch. Chúng không phải log lấy từ một nạn nhân thật và không chứa credential thật.
+The fixtures are sanitized simulations. They are not logs from a real victim and contain no real credentials.
 
-## Cách chấm
+## Scoring
 
-Matcher đọc field trong fixture rồi trả về rule ID dự đoán. Kết quả được so với `expected`:
+The matcher reads fixture fields, predicts a rule ID, and compares it with `expected`:
 
-- TP: dự đoán đúng alert và đúng rule.
-- FP: dự đoán alert trong negative case.
-- FN: không dự đoán alert trong positive case.
-- TN: không dự đoán alert trong negative case.
-- WRONG_RULE: có alert nhưng match nhầm rule.
+- TP: the expected alert fired under the correct rule.
+- FP: a negative case produced an alert.
+- FN: a positive case produced no alert.
+- TN: a negative case produced no alert.
+- WRONG_RULE: an alert fired under the wrong rule.
 
-Precision được tính bằng `TP / (TP + FP)`. Recall được tính bằng `TP / (TP + FN)`. Chỉ positive và negative được đưa vào hai mẫu số này.
+Precision is `TP / (TP + FP)`; recall is `TP / (TP + FN)`. Only positive and negative cases contribute to those metrics. Edge cases are listed separately because their useful outcome is often `manual_review`, which a single precision or recall number would hide.
 
-Edge case được báo riêng vì nó thường cần `manual_review`, không nên ép thành một con số precision/recall đơn giản.
+## Baseline and safety candidate
 
-## Baseline và safety
+The baseline models the field conditions in the existing Wazuh rules. The safety candidate adds decision logic:
 
-Baseline mô phỏng các điều kiện field của Wazuh rules hiện tại. Safety profile thêm một lớp chính sách:
+- Missing identity or source context lowers confidence.
+- Missing command-line context should not trigger immediate host isolation.
+- A known security process touching a canary is not, by itself, proof of ransomware.
 
-- Thiếu identity hoặc source context thì hạ mức chắc chắn.
-- Thiếu command line thì không nên tự động cô lập ngay.
-- Process bảo mật hợp lệ chạm canary thì không nên suy ra ransomware ngay.
+The safety candidate is a test model, not a complete production policy.
 
-Safety profile là mô hình kiểm thử chất lượng, không phải production policy hoàn chỉnh.
+## Actual Wazuh results
 
-## Actual Wazuh
+If a file is present in `reports/actual/`, the runner also compares the rule ID observed after the event passed through a Windows Agent and appeared in Discover. Pasting JSON into Ruleset Test shows that the `json` decoder can read the fields; it does not produce an actual result for a Windows rule expecting `windows_eventchannel`. Actual-result files are ignored by `.gitignore` because they may contain details from a personal environment.
 
-Khi có file trong `reports/actual/`, runner so sánh thêm rule ID thật từ event đã đi qua Windows Agent và được kiểm tra trong Discover. JSON dán vào Ruleset Test chỉ chứng minh decoder `json` đọc được field; nó không tạo được kết quả actual của rule Windows cần `windows_eventchannel`. File actual không được commit vì có thể chứa output môi trường cá nhân; `.gitignore` đã bỏ qua thư mục đó.
-
-Offline result cho biết logic kiểm thử local hoạt động thế nào. Actual result cho biết Wazuh Manager trong VMware thực sự decode và match thế nào. Hai kết quả có thể khác, và sự khác biệt đó chính là dữ liệu tuning có ích.
+Offline results show how the local model behaves. Actual results show how the Wazuh Manager in VMware decoded and matched an event. A disagreement between them is useful tuning evidence.
