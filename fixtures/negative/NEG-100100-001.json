@@ -25,5 +25,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "AES ticket does not match the lab RC4 Kerberoasting rule."
+  "notes": "AES ticket does not match the lab RC4 Kerberoasting rule.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    },
+    "safety": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    }
+  }
 }

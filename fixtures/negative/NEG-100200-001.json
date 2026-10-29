@@ -25,5 +25,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "The filename does not match the canary naming convention."
+  "notes": "The filename does not match the canary naming convention.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    },
+    "safety": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    }
+  }
 }

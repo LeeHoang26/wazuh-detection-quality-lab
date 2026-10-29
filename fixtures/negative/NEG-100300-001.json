@@ -26,5 +26,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "The parent-child relationship is common for an interactive local session."
+  "notes": "The parent-child relationship is common for an interactive local session.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    },
+    "safety": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    }
+  }
 }

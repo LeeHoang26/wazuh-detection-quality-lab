@@ -25,5 +25,17 @@
     "mitre": "T1486",
     "action": "suspend_dump_terminate"
   },
-  "notes": "The alert should preserve PID and filename context for follow-on triage."
+  "notes": "The alert should preserve PID and filename context for follow-on triage.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100200"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100200"
+    }
+  }
 }

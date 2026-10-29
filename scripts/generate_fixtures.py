@@ -191,6 +191,35 @@ CASES = [
     ),
 ]
 
+# Explicit contracts are reviewed separately from matcher predicates. Known false
+# positives remain measured errors; these contracts only allow their historical
+# behavior in the regression gate.
+PROFILE_CONTRACTS = {
+    "POS-100100-001": (("TP", "investigate"), ("TP", "investigate")),
+    "POS-100101-001": (("TP", "investigate"), ("TP", "investigate")),
+    "POS-100102-001": (("TP", "investigate"), ("TP", "investigate")),
+    "POS-100300-001": (("TP", "investigate"), ("TP", "investigate")),
+    "POS-100200-001": (("TP", "investigate"), ("TP", "investigate")),
+    "NEG-100100-001": (("TN", "no_alert"), ("TN", "no_alert")),
+    "NEG-100101-001": (("TN", "no_alert"), ("TN", "no_alert")),
+    "NEG-100102-001": (("TN", "no_alert"), ("TN", "no_alert")),
+    "NEG-100102-002": (("FP", "investigate"), ("FP", "manual_review")),
+    "NEG-100300-001": (("TN", "no_alert"), ("TN", "no_alert")),
+    "NEG-100200-001": (("TN", "no_alert"), ("TN", "no_alert")),
+    "NEG-100200-002": (("FP", "investigate"), ("TN", "no_alert")),
+    "EDGE-100300-001": (("TP", "manual_review"), ("TP", "manual_review")),
+    "EDGE-100100-001": (("TP", "manual_review"), ("TP", "manual_review")),
+    "EDGE-100102-001": (("TP", "investigate"), ("TP", "investigate")),
+    "EDGE-100200-001": (("TP", "manual_review"), ("TP", "manual_review")),
+    "EDGE-100300-002": (("TP", "manual_review"), ("TP", "manual_review")),
+}
+for item in CASES:
+    item["expected_profiles"] = {
+        profile: {"outcome": contract[0], "action": contract[1],
+                  "predicted_rule": None if contract[0] == "TN" else item["detection_id"].removeprefix("DET-")}
+        for profile, contract in zip(("baseline", "safety"), PROFILE_CONTRACTS[item["case_id"]])
+    }
+
 
 def main() -> None:
     for item in CASES:
@@ -201,7 +230,7 @@ def main() -> None:
         path.write_text(json.dumps(item, indent=2) + "\n", encoding="utf-8")
 
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "description": "Expected outcomes for the curated detection regression corpus.",
         "cases": [
             {
@@ -210,6 +239,7 @@ def main() -> None:
                 "kind": item["kind"],
                 "detection_id": item["detection_id"],
                 "expected": item["expected"],
+                "expected_profiles": item["expected_profiles"],
             }
             for item in CASES
         ],

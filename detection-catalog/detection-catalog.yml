@@ -46,4 +46,4 @@
   hypothesis: A write to a designated canary file may indicate ransomware activity.
   required_fields: [eventID, targetFilename, image, processId]
   response: preserve_evidence_then_contain
-  limitation: Security tools can touch files and must be treated as known-good writers.
+  limitation: A security-tool executable name is not proof of trusted identity. The offline triage policy retains the alert for manual review; the XML candidate only narrows the target to an exact protected TXT basename.

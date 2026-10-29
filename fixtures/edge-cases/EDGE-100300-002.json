@@ -25,5 +25,17 @@
     "mitre": "T1021.006",
     "action": "manual_review"
   },
-  "notes": "Parent and child images are enough for the lab rule, but investigation context is incomplete."
+  "notes": "Parent and child images are enough for the lab rule, but investigation context is incomplete.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100300"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100300"
+    }
+  }
 }

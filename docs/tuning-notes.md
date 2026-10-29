@@ -30,9 +30,9 @@ If the command line is missing, keep the alert for investigation. Do not isolate
 
 A canary filename match is a fast signal, but Defender, SearchIndexer, and backup processes can touch files legitimately. Any allowlist should use a full path, signer, hash, or process role rather than a broad filename exception.
 
-A cautious response preserves evidence, records the PID and filename, checks whether other files changed, and reviews the process tree before suspending or terminating anything.
+The safety profile retains the canary alert and returns `manual_review` for a recognized security/indexing executable basename; the name alone is not trusted identity. Lookalike basenames do not receive this decision. A cautious response preserves evidence, records the PID and filename, checks whether other files changed, and reviews the process tree before suspending or terminating anything.
 
-On WK01, Sysmon Event 11 recorded `Explorer.EXE` creating a `.lnk` shortcut in `Recent`; its name contained `_financial_payroll_2026`. A rule that matches only that substring treats the shortcut like the protected canary. Active Response had been configured for `100200` even though the rule was not yet loaded. The handler searches the ten most recent Event 11 records for a PID and then attempts suspension and termination. The exact path, extension, and process must be checked before enabling that response.
+On WK01, Sysmon Event 11 recorded `Explorer.EXE` creating a `.lnk` shortcut in `Recent`; its name contained `_financial_payroll_2026`. A rule that matches only that substring treats the shortcut like the protected canary. Active Response had been configured for `100200` even though the rule was not yet loaded. That test kept the response disabled. The consolidated handler now checks the triggering alert identity against Sysmon process-create evidence and the live process; it must be validated separately before enabling response.
 
 ## Tuning ground rules
 
@@ -43,4 +43,4 @@ On WK01, Sysmon Event 11 recorded `Explorer.EXE` creating a `.lnk` shortcut in `
 
 ## Shortcut candidate
 
-`NEG-100200-002` recreates exported WK01 record 8390 with sample username and domain values. The safety candidate excludes only `!_financial_payroll_2026.txt.lnk` directly under `C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Recent` from canary detection. An Explorer write to the actual `.txt` canary must still match. This narrows the protected file scope; it does not certify Explorer or shortcuts as safe. The [case study](canary-shortcut-case-study.md) records the source, hash, and boundary tests.
+`NEG-100200-002` recreates exported WK01 record 8390 with sample username and domain values. The safety candidate requires the exact TXT basename `!_financial_payroll_2026.txt` or `!_confidential_contract.txt`, matching the XML candidate. Shortcuts and suffix lookalikes are outside that scope. An Explorer write to the actual `.txt` canary must still match. This narrows the protected file scope; it does not certify Explorer or shortcuts as safe. The [case study](canary-shortcut-case-study.md) records the source, hash, and boundary tests.

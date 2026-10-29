@@ -24,5 +24,17 @@
     "mitre": "T1558.003",
     "action": "manual_review"
   },
-  "notes": "Detection confidence is reduced because the identity context is incomplete."
+  "notes": "Detection confidence is reduced because the identity context is incomplete.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100100"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100100"
+    }
+  }
 }

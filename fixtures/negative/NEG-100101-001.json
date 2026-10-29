@@ -25,5 +25,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "The event lacks both AS-REP indicators required by the rule."
+  "notes": "The event lacks both AS-REP indicators required by the rule.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    },
+    "safety": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    }
+  }
 }

@@ -24,5 +24,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "A generic 4662 event is not sufficient to identify DCSync."
+  "notes": "A generic 4662 event is not sufficient to identify DCSync.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    },
+    "safety": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    }
+  }
 }
