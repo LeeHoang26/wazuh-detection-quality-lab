@@ -1,6 +1,6 @@
 # Wazuh Detection Quality and Regression Lab
 
-I built this lab to answer a practical SOC question: after writing a Wazuh rule, how do I know it still works and is not creating noisy alerts?
+I use 17 sanitized telemetry cases to check five Wazuh rule conditions, compare false positives and catch changes in detection or triage decisions.
 
 This repository is the validation companion to my [Active Directory Detection and Response Lab](https://github.com/LeeHoang26/ad-threat-detection-and-response-lab). The first project focuses on detection and response. This one focuses on testing, false positives, missing context and regression after a rule change.
 
@@ -22,11 +22,11 @@ The detection set covers:
 | `100200` | Protected canary TXT file | Sysmon Event 11 |
 | `100300` | WMI or WinRM remote shell | Sysmon Event 1 |
 
-The questions behind the cases are more useful than the rule names. Is one RC4 ticket enough evidence? Should a Domain Controller replication event be treated like DCSync? Should a Recent-items `.lnk` shortcut be treated like a canary file write?
+The cases include a legitimate DC replication pattern, incomplete event fields and a Recent-items shortcut that the broad canary baseline matched incorrectly.
 
 ## Lab result
 
-The live VMware run produced useful differences between the baseline rules and the safer candidate logic.
+The offline matcher produced these results on 12 scored positive/negative cases. The five edge cases are reported separately.
 
 | Profile | TP | FP | FN | TN | Precision | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -39,7 +39,7 @@ The repository also contains a live canary validation. A Sysmon Event 11 for `Ca
 
 ## Evidence
 
-The screenshots below are sanitized copies of the live Wazuh result. IP addresses, hostnames and account names are covered before publication.
+The Wazuh screenshots show the recorded live canary result with personal environment details covered. The regression summary records an offline run.
 
 ![Wazuh canary rule 100200](assets/wazuh-rule-100200.png)
 
@@ -61,19 +61,15 @@ python scripts\run_regression.py --profile safety
 python -m unittest discover -s tests
 ```
 
-Expected validation output:
+Fixture validation prints `FIXTURE VALIDATION PASSED: 17 cases`; unittest reports its test count and result.
 
-```text
-FIXTURE VALIDATION PASSED: 17 cases
-Ran 9 tests
-OK
-```
+The generated reports are in `reports/`. Each profile has explicit expected rule, outcome and action contracts. A changed outcome or action fails the runner; known baseline false positives remain visible in the metrics. Unit tests cover missing context, lookalike executable names and regression failures without adding cases to the 17-case corpus.
 
-The generated reports are in `reports/`. The `Decision` column is an offline analyst recommendation. It does not suppress alerts or claim that a real Wazuh event was benign.
+The `Decision` column is an offline analyst recommendation. `manual_review` retains the alert and does not label a real event benign.
 
 ## VMware validation
 
-The live lab uses these machines:
+The recorded live lab used these machines:
 
 | Machine | Role |
 | --- | --- |
@@ -81,7 +77,7 @@ The live lab uses these machines:
 | `DC01` | Windows Server, Active Directory and Security events |
 | `WK01` | Windows endpoint, Sysmon and Wazuh Agent |
 
-The manual VMware walkthrough is kept outside this portfolio repository. The important live workflow is:
+The manual VMware walkthrough is kept outside this repository. For live validation:
 
 1. Check the Windows Event Viewer or Sysmon event.
 2. Check the corresponding alert in Wazuh Discover.
@@ -101,4 +97,4 @@ Pasted JSON in Ruleset Test is useful for inspecting decoder fields. It is not a
 
 This repository contains sanitized telemetry and detection tests. It does not disable accounts, block hosts, terminate processes or send messages. The canary Active Response handler was kept disabled while the candidate rule was validated.
 
-The project is ready for a local review. GitHub upload is intentionally a separate step after the screenshots and README are reviewed once more.
+Only sanitized fixtures and screenshots are included; raw EVTX and unedited screenshots remain outside the repository.

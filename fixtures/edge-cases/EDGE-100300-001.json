@@ -25,5 +25,17 @@
     "mitre": "T1047",
     "action": "manual_review"
   },
-  "notes": "Detection can fire, but source_ip_confidence is low until Event 4624 is correlated."
+  "notes": "Detection can fire, but source_ip_confidence is low until Event 4624 is correlated.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100300"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100300"
+    }
+  }
 }

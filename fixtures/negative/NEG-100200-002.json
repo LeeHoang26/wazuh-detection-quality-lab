@@ -25,5 +25,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "Sanitized reconstruction of WK01 Sysmon record 8390, 2026-09-20T07:05:33.2316129Z. Expected no canary-tampering alert: the target is a shortcut, not the protected TXT file. No actual Wazuh 100200 match was observed; see docs/canary-shortcut-case-study.md. This label does not classify every shortcut as benign."
+  "notes": "Sanitized reconstruction of WK01 Sysmon record 8390, 2026-09-20T07:05:33.2316129Z. Expected no canary-tampering alert: the target is a shortcut, not the protected TXT file. No actual Wazuh 100200 match was observed; see docs/canary-shortcut-case-study.md. This label does not classify every shortcut as benign.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "FP",
+      "action": "investigate",
+      "predicted_rule": "100200"
+    },
+    "safety": {
+      "outcome": "TN",
+      "action": "no_alert",
+      "predicted_rule": null
+    }
+  }
 }

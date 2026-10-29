@@ -25,5 +25,17 @@
     "mitre": "T1558.003",
     "action": "alert_and_investigate"
   },
-  "notes": "A single RC4 request is a lab signal; production tuning should add frequency and context."
+  "notes": "A single RC4 request is a lab signal; production tuning should add frequency and context.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100100"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100100"
+    }
+  }
 }

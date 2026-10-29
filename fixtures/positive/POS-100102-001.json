@@ -24,5 +24,17 @@
     "mitre": "T1003.006",
     "action": "critical_investigation"
   },
-  "notes": "The replication GUID is the primary indicator used by the lab rule."
+  "notes": "The replication GUID is the primary indicator used by the lab rule.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100102"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100102"
+    }
+  }
 }

@@ -25,5 +25,17 @@
     "mitre": "T1486",
     "action": "manual_review"
   },
-  "notes": "The filename matches the rule, but the known Defender writer should not trigger destructive containment."
+  "notes": "The filename matches the rule, but the known Defender writer should not trigger destructive containment.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100200"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "manual_review",
+      "predicted_rule": "100200"
+    }
+  }
 }

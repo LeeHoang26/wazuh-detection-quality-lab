@@ -24,5 +24,17 @@
     "mitre": "T1003.006",
     "action": "critical_investigation"
   },
-  "notes": "The detection uses case-insensitive matching and should still fire."
+  "notes": "The detection uses case-insensitive matching and should still fire.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100102"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100102"
+    }
+  }
 }

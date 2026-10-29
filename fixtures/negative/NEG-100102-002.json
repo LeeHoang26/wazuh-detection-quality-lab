@@ -25,5 +25,17 @@
     "mitre": null,
     "action": "no_alert"
   },
-  "notes": "Based on five real rule 100102 alerts from DC01$ in the lab. Confirm the DC identity and replication context before suppressing; a compromised DC can also replicate."
+  "notes": "Based on five real rule 100102 alerts from DC01$ in the lab. Confirm the DC identity and replication context before suppressing; a compromised DC can also replicate.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "FP",
+      "action": "investigate",
+      "predicted_rule": "100102"
+    },
+    "safety": {
+      "outcome": "FP",
+      "action": "manual_review",
+      "predicted_rule": "100102"
+    }
+  }
 }

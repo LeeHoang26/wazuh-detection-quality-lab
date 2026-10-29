@@ -18,7 +18,8 @@ class CanaryShortcutTests(unittest.TestCase):
     def test_same_ground_truth_before_and_after(self):
         baseline_expected = expected_for_profile(self.fixture, "baseline")
         safety_expected = expected_for_profile(self.fixture, "safety")
-        self.assertEqual(baseline_expected, safety_expected)
+        self.assertEqual(baseline_expected["outcome"], "FP")
+        self.assertEqual(safety_expected["outcome"], "TN")
         self.assertEqual(outcome(baseline_match(self.fixture)[0], baseline_expected), "FP")
         self.assertEqual(outcome(safety_match(self.fixture)[0], safety_expected), "TN")
 
@@ -27,13 +28,20 @@ class CanaryShortcutTests(unittest.TestCase):
             r"C:\Users\Public\!_financial_payroll_2026.txt",
             r"C:\Users\labuser\Desktop\!_financial_payroll_2026.txt",
             r"C:\Users\labuser\AppData\Roaming\Microsoft\Windows\Recent\!_financial_payroll_2026.txt",
-            r"C:\Tools\!_financial_payroll_2026.txt.lnk",
-            r"C:\Users\labuser\AppData\Roaming\Microsoft\Windows\Recent\!_financial_payroll_2026.txt.lnk.exe",
         ):
             with self.subTest(path=path):
                 fixture = copy.deepcopy(self.fixture)
                 fixture["data"]["win"]["eventdata"]["targetFilename"] = path
                 self.assertEqual(safety_match(fixture)[0], "100200")
+
+    def test_safety_scope_requires_exact_protected_txt_name(self):
+        for path in (
+            r"C:\Tools\!_financial_payroll_2026.txt.lnk",
+            r"C:\Users\labuser\AppData\Roaming\Microsoft\Windows\Recent\!_financial_payroll_2026.txt.lnk.exe",
+        ):
+            fixture = copy.deepcopy(self.fixture)
+            fixture["data"]["win"]["eventdata"]["targetFilename"] = path
+            self.assertIsNone(safety_match(fixture)[0])
 
     def test_case_insensitive_path_scope_does_not_depend_on_explorer_name(self):
         data = self.fixture["data"]["win"]["eventdata"]

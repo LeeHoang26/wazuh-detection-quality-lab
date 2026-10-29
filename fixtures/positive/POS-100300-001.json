@@ -26,5 +26,17 @@
     "mitre": "T1047",
     "action": "correlate_and_isolate"
   },
-  "notes": "Sysmon provides process lineage; Security Event 4624 supplies the remote source context."
+  "notes": "Sysmon provides process lineage; Security Event 4624 supplies the remote source context.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100300"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100300"
+    }
+  }
 }

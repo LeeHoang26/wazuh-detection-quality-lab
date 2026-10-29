@@ -25,5 +25,17 @@
     "mitre": "T1558.004",
     "action": "contain_identity_in_lab"
   },
-  "notes": "The lab validates identity containment; production response requires an approved IAM playbook."
+  "notes": "The lab validates identity containment; production response requires an approved IAM playbook.",
+  "expected_profiles": {
+    "baseline": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100101"
+    },
+    "safety": {
+      "outcome": "TP",
+      "action": "investigate",
+      "predicted_rule": "100101"
+    }
+  }
 }
